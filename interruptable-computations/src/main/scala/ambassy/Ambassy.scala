@@ -33,31 +33,17 @@ object Ambassy extends App {
     }
   }
 
-  def computation(): Int = {
-    println("Start computation:" + Thread.currentThread() + ":" + Thread.currentThread().getId)
-    try {
-      //while (true) {} //simulate a non-interruptible computation
-      //Thread.sleep(10000) //simulate an interruptible computation
-      common.Pi.longComputation(true, 10000)
-    } catch {
-      case tde: ThreadDeath         ⇒
-        println("DEATH1"); 0 //never trigged
-      case ie: InterruptedException ⇒
-        println("InterruptedException catched => Computation interrupted"); 0 //trigged only if computation is interruptible
-      case _: Throwable             ⇒ println("SOME EXCEPTION1"); 0
-    } finally {
-      println("Computation terminated") //never reached till the end of the computation if the computation is non-interruptible
-    }
-  }
-
   //2 possibilities :
   //- we get the value resulting from the computation
   //- we get notified that a timeout occurred but we've got no guarantee about the computation termination.
   try {
-    val n = forkProcess[Int](computation, 2.seconds)
-    println(s"$n decimal of Pi computed")
+    val f = () ⇒ common.Computations.longComputation(true, 200)
+    //val f = () ⇒ common.Computations.fakeComputation(true)
+    val n = forkProcess[Option[Int]](f, 2.seconds)
+    println(s"${n.getOrElse("No")} decimal of Pi computed")
   } catch {
     case e: TimeoutException ⇒ println("TimeoutException catched")
   }
-
+  println("Delay to check if the computation has been interrupted or not")
+  Thread.sleep(10000)
 }
