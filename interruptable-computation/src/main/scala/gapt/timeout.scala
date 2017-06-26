@@ -61,7 +61,7 @@ object withTimeout {
 }
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future, _}
+import scala.concurrent.{Await, Future}
 
 object withTimeout2 {
   def apply[T](to: Duration)(f: ⇒ T): T = {

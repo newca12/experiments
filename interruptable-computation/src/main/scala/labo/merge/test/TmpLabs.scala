@@ -6,8 +6,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.Left
 import scala.Right
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import scala.util.Try
 
 object TmpLabs extends App {

@@ -1,7 +1,6 @@
 package labo.merge.labo
 
 import com.twitter.util.Future
-import com.twitter.util.FutureCancelledException
 
 object TwitterFuture extends App {
   def test(): Int = {

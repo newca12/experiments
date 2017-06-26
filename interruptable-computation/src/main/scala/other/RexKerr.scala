@@ -1,6 +1,6 @@
 package other
 
-import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.Await
 
 // This method will not interrupt a non-interruptible computation.

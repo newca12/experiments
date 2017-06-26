@@ -2,7 +2,6 @@ package labo.merge.xs
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import java.util.concurrent._
 
 object Test extends App {
   import concurrent.ExecutionContext.Implicits.global
