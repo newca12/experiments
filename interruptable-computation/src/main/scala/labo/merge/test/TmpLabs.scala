@@ -189,7 +189,7 @@ object withTimeout {
     var result: Either[Throwable, T] = Left(new TimeOutException())
 
     val r = new Runnable {
-      def run() {
+      def run(): Unit = {
         try {
           result = Right(f)
         } catch {

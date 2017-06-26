@@ -101,7 +101,7 @@ abstract class InterruptableFuture[+T] {
 
     p.future
   }
-  def onComplete[U](func: Try[T] ⇒ U)(implicit executor: ExecutionContext) {
+  def onComplete[U](func: Try[T] ⇒ U)(implicit executor: ExecutionContext): Unit = {
     future.onComplete(func)
   }
 
@@ -123,14 +123,14 @@ abstract class InterruptableFuture[+T] {
 trait Interruptable {
   private[this] var cancelled       = false;
   private[this] val cancelFunctions = new ListBuffer[() ⇒ Unit]
-  def onCancel(f: () ⇒ Unit) {
+  def onCancel(f: () ⇒ Unit): Unit = {
     synchronized {
       if (cancelled) f()
       else cancelFunctions += f
     }
   }
 
-  def cancel() {
+  def cancel(): Unit = {
     //println("Attempting to cancel future")
     synchronized {
       if (!cancelled) {
@@ -167,7 +167,7 @@ class InterruptablePromise[T] extends Interruptable { ipthis ⇒
     }
     res
   }
-  def completeCode(code: ⇒ T) {
+  def completeCode(code: ⇒ T): Unit = {
     promise complete {
       try Success(executeInAnInterruptableManner(code))
       catch {
@@ -189,8 +189,8 @@ class InterruptablePromise[T] extends Interruptable { ipthis ⇒
   def failure(t: Throwable) = promise.failure(t)
 
   val future: InterruptableFuture[T] = new InterruptableFuture[T] {
-    def cancel() { ipthis.cancel() }
-    def onCancel(f: () ⇒ Unit) { ipthis.onCancel(f) }
+    def cancel(): Unit = { ipthis.cancel() }
+    def onCancel(f: () ⇒ Unit): Unit = { ipthis.onCancel(f) }
     val future = promise.future
 
   }
@@ -201,7 +201,7 @@ object InterruptableFuture {
   def future[T](code: ⇒ T)(implicit ex: ExecutionContext): InterruptableFuture[T] = {
     val p = new InterruptablePromise[T]
     ex.execute(new Runnable() {
-      override def run() { p.completeCode(code) }
+      override def run(): Unit = { p.completeCode(code) }
     })
     p.future
   }
@@ -247,7 +247,7 @@ trait ChangeHandle {
   private var hadChange                        = false
 
   /** Call to add a function that will be called (once) when there is some change. This handle will then be obsolete. */
-  def addChangeListener(f: () ⇒ Unit) {
+  def addChangeListener(f: () ⇒ Unit): Unit = {
     synchronized {
       if (hadChange) f()
       else changeListeners = f :: changeListeners
@@ -258,7 +258,7 @@ trait ChangeHandle {
   def dispose()
 
   /** Call when a change actually happens */
-  def change() {
+  def change(): Unit = {
     //println("ChangeHandle "+this+" change()")
     val tonotify: List[() ⇒ Unit] = synchronized {
       if (!hadChange) {
@@ -283,7 +283,7 @@ class ConventionalChangeHandle extends ChangeHandle {
   var handles: List[() ⇒ Unit] = Nil
   var disposed                 = false
 
-  def addDisposalFunction(h: () ⇒ Unit) {
+  def addDisposalFunction(h: () ⇒ Unit): Unit = {
     synchronized {
       if (disposed) h()
       else {
@@ -291,7 +291,7 @@ class ConventionalChangeHandle extends ChangeHandle {
       }
     }
   }
-  override def dispose() {
+  override def dispose(): Unit = {
     //println("ChangeHandleBuffer "+this+" dispose()")
     synchronized {
       if (!disposed) {
@@ -312,7 +312,7 @@ class ChangeHandleBuffer extends ChangeHandle {
   var handles: List[ChangeHandle] = Nil
   var disposed                    = false
 
-  def add(h: ChangeHandle) {
+  def add(h: ChangeHandle): Unit = {
     synchronized {
       if (disposed) h.dispose()
       else {
@@ -321,7 +321,7 @@ class ChangeHandleBuffer extends ChangeHandle {
       }
     }
   }
-  override def dispose() {
+  override def dispose(): Unit = {
     //println("ChangeHandleBuffer "+this+" dispose()")
     synchronized {
       if (!disposed) {
@@ -347,26 +347,26 @@ class OnObsoleteList(val name: String = null) {
   private[this] var callbackOnNonEmpty
     : Set[() ⇒ Unit] = Set.empty // for functions that want to know when something has become non-empty.
 
-  def remove(h: ChangeHandleForObsoleteList) {
+  def remove(h: ChangeHandleForObsoleteList): Unit = {
     val gotToZero = synchronized { handles -= h; handles.isEmpty }
     if (gotToZero) for (h ← callbackOnEmpty) h()
   }
-  def add(h: ChangeHandleForObsoleteList) {
+  def add(h: ChangeHandleForObsoleteList): Unit = {
     val wasEmpty = synchronized { val wasEmpty = handles.isEmpty; handles += h; wasEmpty }
     if (wasEmpty) for (h ← callbackOnNonEmpty) h()
   }
 
-  def removeCallbackOnEmpty(h: () ⇒ Unit) { synchronized { callbackOnEmpty -= h } }
+  def removeCallbackOnEmpty(h: () ⇒ Unit): Unit = { synchronized { callbackOnEmpty -= h } }
 
   /** add a function that will be called whenever the handle count gets down to zero. */
-  def addCallbackOnEmpty(h: () ⇒ Unit) { synchronized { callbackOnEmpty += h } }
+  def addCallbackOnEmpty(h: () ⇒ Unit): Unit = { synchronized { callbackOnEmpty += h } }
 
-  def removeCallbackOnNonEmpty(h: () ⇒ Unit) { synchronized { callbackOnNonEmpty -= h } }
+  def removeCallbackOnNonEmpty(h: () ⇒ Unit): Unit = { synchronized { callbackOnNonEmpty -= h } }
 
   /** add a function that will be called whenever the handle count gets down to zero. */
-  def addCallbackOnNonEmpty(h: () ⇒ Unit) { synchronized { callbackOnNonEmpty += h } }
+  def addCallbackOnNonEmpty(h: () ⇒ Unit): Unit = { synchronized { callbackOnNonEmpty += h } }
 
-  def callAndClear() {
+  def callAndClear(): Unit = {
     val backupHandles = synchronized {
       //println("Clearing handles"+handles.mkString(","))
       val backupHandles = handles
@@ -406,7 +406,7 @@ class OnObsoleteList(val name: String = null) {
   *
   */
 class ChangeHandleForObsoleteList(ool: OnObsoleteList) extends ChangeHandle {
-  override def dispose() {
+  override def dispose(): Unit = {
     //println("ChangeHandleBuffer "+this+" dispose()")
     ool.remove(this)
   }
@@ -449,21 +449,21 @@ class ObsoletableAndInterruptableFuture[+T](val future: InterruptableFuture[T], 
 
   //def asProgress(progressMonitor:ProgressMonitor,amount:Double)(implicit executor: ExecutionContext) : ObsoletableAndInterruptableFuture[T] = andThen{case _ => progressMonitor.doUnitWork(amount)}
 
-  def dispose() {
+  def dispose(): Unit = {
     for (c ← changes) c.dispose()
   }
-  def addChangeListener(onExternalChange: () ⇒ Unit) {
+  def addChangeListener(onExternalChange: () ⇒ Unit): Unit = {
     for (c ← changes) c.addChangeListener(onExternalChange)
   }
 
   /** dispose, after it has completed */
-  def disposeOnComplete()(implicit executor: ExecutionContext) {
+  def disposeOnComplete()(implicit executor: ExecutionContext): Unit = {
     future.future.onComplete { case _ ⇒ this.dispose() }
   }
-  def onComplete[U](func: Try[T] ⇒ U)(implicit executor: ExecutionContext) {
+  def onComplete[U](func: Try[T] ⇒ U)(implicit executor: ExecutionContext): Unit = {
     future.onComplete(func)
   }
-  def cancel() { future.cancel() }
+  def cancel(): Unit = { future.cancel() }
 
 }
 
@@ -481,7 +481,7 @@ object ObsoletableAndInterruptableFuture {
     } map (_.result)
   }
 
-  val alreadyObsoleteHandle = new ChangeHandle { def dispose() {} }
+  val alreadyObsoleteHandle = new ChangeHandle { def dispose(): Unit = {} }
   alreadyObsoleteHandle.change()
 
   val alreadyObsolete: ObsoletableAndInterruptableFuture[Nothing] = new ObsoletableAndInterruptableFuture(
@@ -522,7 +522,7 @@ class ObsoletableAndInterruptableFutureCache[T](original: ObsoletableAndInterrup
   private[this] var clients: Set[ObsoletableAndInterruptableFutureCacheClient[T]] = Set.empty
   private[this] var finishedResult: Option[Try[T]]                                = None
 
-  def dispose() {
+  def dispose(): Unit = {
     synchronized {
       if (!disposed) {
         original.dispose()
@@ -533,7 +533,7 @@ class ObsoletableAndInterruptableFutureCache[T](original: ObsoletableAndInterrup
 
   original.addChangeListener(() ⇒ dispose())
 
-  private def completed(res: Try[T]) {
+  private def completed(res: Try[T]): Unit = {
     synchronized {
       finishedResult = Some(res)
       for (c ← clients) c.completed(res)
@@ -543,7 +543,7 @@ class ObsoletableAndInterruptableFutureCache[T](original: ObsoletableAndInterrup
   original.future.future.onComplete { completed _ }
 
   /** Called when the number of client OIFs has reduced to zero. Can override it if you want to preserve */
-  def reachedZeroClients() { original.future.cancel(); dispose() }
+  def reachedZeroClients(): Unit = { original.future.cancel(); dispose() }
 
   def get(): ObsoletableAndInterruptableFuture[T] = {
     synchronized {
@@ -561,14 +561,14 @@ class ObsoletableAndInterruptableFutureCache[T](original: ObsoletableAndInterrup
   /** Mostly for debugging purposes. */
   def numClients: Int = synchronized { clients.size }
 
-  def childDispose(client: ObsoletableAndInterruptableFutureCacheClient[T]) {
+  def childDispose(client: ObsoletableAndInterruptableFutureCacheClient[T]): Unit = {
     synchronized {
       clients -= client
       if (clients.isEmpty) reachedZeroClients()
     }
   }
 
-  def childCancel(client: ObsoletableAndInterruptableFutureCacheClient[T]) {
+  def childCancel(client: ObsoletableAndInterruptableFutureCacheClient[T]): Unit = {
     synchronized {
       clients -= client
       if (clients.isEmpty) reachedZeroClients()
@@ -591,12 +591,12 @@ private class ObsoletableAndInterruptableFutureCacheClient[T](cache: Obsoletable
     cache.childCancel(clientthis)
   }
 
-  def dispose() { obsolete.dispose() }
-  def invalidate() { obsolete.change() }
+  def dispose(): Unit = { obsolete.dispose() }
+  def invalidate(): Unit = { obsolete.change() }
 
   def get: ObsoletableAndInterruptableFuture[T] = new ObsoletableAndInterruptableFuture(future, List(obsolete))
   // extends ConventionalChangeHandle
 
-  def completed(res: Try[T]) { promise.complete(res) }
+  def completed(res: Try[T]): Unit = { promise.complete(res) }
 
 }

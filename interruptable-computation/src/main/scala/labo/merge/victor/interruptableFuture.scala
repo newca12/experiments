@@ -107,10 +107,10 @@ object interruptableFuture extends App {
   //import java.util.concurrent.Future
   import java.util.concurrent.TimeUnit
   import java.util.concurrent.Callable
-  private def forkProcess(proc: Process, timeout: Duration) {
+  private def forkProcess(proc: Process, timeout: Duration): Unit = {
     val executor = Executors.newSingleThreadExecutor()
     val future: java.util.concurrent.Future[Unit] = executor.submit(new Callable[Unit] {
-      def call { proc.exitValue() }
+      def call: Unit = { proc.exitValue() }
     })
     try {
       future.get(timeout.toSeconds, TimeUnit.SECONDS)
