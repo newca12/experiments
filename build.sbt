@@ -1,36 +1,47 @@
-import scalariform.formatter.preferences._
+scalafmtOnCompile in ThisBuild := true
+scalafmtVersion in ThisBuild := "1.0.0-RC4"
+scalaVersion in ThisBuild := "2.12.2"
 
 lazy val commonSettings = Seq(
   organization := "org.edla",
-  version := "0.1.0",
-  scalaVersion := "2.11.6",
+  version := "0.2.0",
+  //libraryDependencies += "org.scala-lang" % "scala-library" % "2.12.1",
+  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3" % "test",
+  // Adapted from Rob Norris' post at https://tpolecat.github.io/2014/04/11/scalac-flags.html
   scalacOptions ++= Seq(
-    "-language:postfixOps", "-language:existentials", "-language:implicitConversions",
+    "-language:postfixOps",
+    "-language:existentials",
+    "-language:implicitConversions",
     //"-optimize",
     "-deprecation",
-    "-encoding", "UTF-8", // yes, this is 2 args
+    "-encoding", // yes this
+    "UTF-8", // is 2 args
     "-feature",
     "-unchecked",
     //"-Xfatal-warnings",
     "-Xlint",
     "-Yno-adapted-args",
+    "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
     "-Xfuture"
   )
-) ++ scalariformSettings :+
-  (ScalariformKeys.preferences := FormattingPreferences().
-    setPreference(RewriteArrowSymbols, true).
-    setPreference(AlignParameters, true).
-    setPreference(AlignSingleLineCaseStatements, true).
-    setPreference(DoubleIndentClassDeclaration, true))
+)
 
-lazy val interruptableComputations = (project in file("interruptable-computations")).
-  settings(commonSettings: _*).
-  settings( // other settings
+lazy val interruptableComputations = project
+  .in(file("interruptable-computation"))
+  .settings(commonSettings: _*)
+  .settings(scalacOptions -= "-Xfatal-warnings") //Thread.stop used
+  .settings(
+    libraryDependencies ++= {
+      val akkaV = "2.5.3"
+      Seq(
+        "com.typesafe.akka" %% "akka-actor"      % akkaV,
+        "com.twitter"       %% "util-collection" % "6.43.0" //last version with Future.cancel (check if raise could fit)
+      )
+    }
   )
 
-lazy val privateObject = (project in file("private-object")).
-  settings(commonSettings: _*).
-  settings( // other settings
-  )
+lazy val experiments =
+  (project in file("."))
+    .aggregate(interruptableComputations)

@@ -19,6 +19,9 @@ project/plugins/project/
 .worksheet
 .scalastyle
 
+# IntelliJ IDEA specific
+.idea
+
 # OSX specific
 .DS_Store
 
