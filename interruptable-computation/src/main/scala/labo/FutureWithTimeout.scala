@@ -12,10 +12,10 @@ object FutureWithTimeout extends App {
 
   val system = ActorSystem("theSystem")
 
-  lazy val f = Future {
+  @volatile lazy val f = Future {
     Thread.sleep(2000); true
   }
-  lazy val t =
+  @volatile lazy val t =
     after(duration = 1 second, using = system.scheduler)(Future.failed(new TimeoutException("Future timed out!")))
 
   val fWithTimeout = Future firstCompletedOf Seq(f, t)
