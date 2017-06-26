@@ -29,9 +29,9 @@ import java.util.concurrent.ExecutionException
   */
 abstract class InterruptableFuture[+T] {
   val future: Future[T]
-  def cancel()
+  def cancel(): Unit
 
-  def onCancel(f: () ⇒ Unit)
+  def onCancel(f: () ⇒ Unit): Unit
 
   def foreach[U](f: T ⇒ U)(implicit executor: ExecutionContext): Unit =
     future.onComplete {
@@ -255,7 +255,7 @@ trait ChangeHandle {
   }
 
   /** Call when you no longer care about possible changes. */
-  def dispose()
+  def dispose(): Unit
 
   /** Call when a change actually happens */
   def change(): Unit = {
