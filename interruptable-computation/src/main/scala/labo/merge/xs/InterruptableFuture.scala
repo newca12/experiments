@@ -189,9 +189,9 @@ class InterruptablePromise[T] extends Interruptable { ipthis ⇒
   def failure(t: Throwable) = promise.failure(t)
 
   val future: InterruptableFuture[T] = new InterruptableFuture[T] {
-    def cancel(): Unit = { ipthis.cancel() }
+    def cancel(): Unit               = { ipthis.cancel() }
     def onCancel(f: () ⇒ Unit): Unit = { ipthis.onCancel(f) }
-    val future = promise.future
+    val future                       = promise.future
 
   }
 
@@ -591,7 +591,7 @@ private class ObsoletableAndInterruptableFutureCacheClient[T](cache: Obsoletable
     cache.childCancel(clientthis)
   }
 
-  def dispose(): Unit = { obsolete.dispose() }
+  def dispose(): Unit    = { obsolete.dispose() }
   def invalidate(): Unit = { obsolete.change() }
 
   def get: ObsoletableAndInterruptableFuture[T] = new ObsoletableAndInterruptableFuture(future, List(obsolete))

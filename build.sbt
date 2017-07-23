@@ -1,5 +1,5 @@
 scalafmtOnCompile in ThisBuild := true
-scalafmtVersion in ThisBuild := "1.0.0-RC4"
+scalafmtVersion in ThisBuild := "1.1.0"
 scalaVersion in ThisBuild := "2.12.2"
 
 lazy val commonSettings = Seq(
@@ -24,7 +24,8 @@ lazy val commonSettings = Seq(
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
-    "-Xfuture"
+    "-Xfuture",
+    "-Ywarn-unused-import"
   )
 )
 
