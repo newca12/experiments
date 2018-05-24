@@ -1,2 +1,3 @@
-addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.8")
-//addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.4.2")
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
+addSbtPlugin("com.geirsson"   % "sbt-scalafmt"           % "1.5.1")
+//addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.5.10")

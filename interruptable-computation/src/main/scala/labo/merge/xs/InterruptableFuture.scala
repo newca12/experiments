@@ -93,7 +93,8 @@ abstract class InterruptableFuture[+T] {
   final def withFilter(p: T ⇒ Boolean)(implicit executor: ExecutionContext): InterruptableFuture[T] =
     filter(p)(executor)
 
-  def recover[U >: T](pf: PartialFunction[Throwable, U])(implicit executor: ExecutionContext): InterruptableFuture[U] = {
+  def recover[U >: T](pf: PartialFunction[Throwable, U])(
+      implicit executor: ExecutionContext): InterruptableFuture[U] = {
     val p = new InterruptablePromise[U]
     p.onCancel(() ⇒ cancel())
 
