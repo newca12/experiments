@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="337.0" prefWidth="609.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tableview.TableViewAppController">
+    <center>
+        <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="columnId" prefWidth="75.0" text="Id" />
+                <TableColumn fx:id="columnName" prefWidth="75.0" text="Name" />
+                <TableColumn fx:id="columnPrice" minWidth="0.0" prefWidth="175.0" text="Price" />
+            </columns>
+        </TableView>
+    </center>
+    <top>
+        <Label prefHeight="67.0" prefWidth="460.0" text="JavaFX TableView with Scala - Example" BorderPane.alignment="CENTER">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Label>
+    </top>
+</BorderPane>
