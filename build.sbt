@@ -83,6 +83,32 @@ lazy val javafx = project
     }
   )
 
+lazy val tika = project
+  .in(file("tika"))
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      /* "org.apache.tika"    % "tika-bundle"       % "1.14",
+      "org.apache.pdfbox"  % "pdfbox"            % "1.8.7",
+      "com.uwyn"           % "jhighlight"        % "1.0",
+      "org.apache.poi"     % "poi"               % "3.15",
+      "org.apache.poi"     % "poi-ooxml"         % "3.15",
+      "org.apache.poi"     % "poi-scratchpad"    % "3.15",
+      "org.apache.commons" % "commons-compress"  % "1.13",
+      "org.apache.poi"     % "poi-ooxml-schemas" % "3.15",
+      "org.apache.poi"     % "ooxml-schemas"     % "1.3"*/
+      "org.apache.tika"    % "tika-bundle"       % "1.18",
+      "org.apache.pdfbox"  % "pdfbox"            % "2.0.9",
+      "com.uwyn"           % "jhighlight"        % "1.0",
+      "org.apache.poi"     % "poi"               % "3.17",
+      "org.apache.poi"     % "poi-ooxml"         % "3.17",
+      "org.apache.poi"     % "poi-scratchpad"    % "3.17",
+      "org.apache.commons" % "commons-compress"  % "1.16.1",
+      "org.apache.poi"     % "poi-ooxml-schemas" % "3.17",
+      "org.apache.poi"     % "ooxml-schemas"     % "1.3"
+    )
+  )
+
 lazy val experiments =
   (project in file("."))
-    .aggregate(interruptableComputations, javafx)
+    .aggregate(interruptableComputations, javafx, tika)

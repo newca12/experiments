@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+	<parsers>
+
+		<!-- use the default parser in most cases, it is a composite of all the
+			parsers listed in META-INF/services/org.apache.tika.parser.Parser -->
+		<parser class="org.apache.tika.parser.DefaultParser" />
+
+		<!-- Disable some parsers extraction -->
+		<parser class="org.apache.tika.parser.EmptyParser">
+			<mime>application/java-vm</mime>
+			<mime>application/postscript</mime>
+		</parser>
+
+	</parsers>
+</properties>
